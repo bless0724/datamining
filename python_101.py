@@ -60,7 +60,11 @@ for e in range(start,start+N):                            #循环2次，读取11
     data = data.split( )                                  #以空格为分隔符，返回数值列表data
     data = [float(s) for s in data]                       #将列表data中的数值强制转换为float类型
 
+<<<<<<< HEAD
     s1 = data[0:45000*4:4]                          #list切片L[n1:n2:n3]  n1代表开始元素下标；n2代表结束元素下标
+=======
+    s1 = data[0:14994*4:4]                          #list切片L[n1:n2:n3]  n1代表开始元素下标；n2代表结束元素下标
+>>>>>>> ee377eee7885028e693f39a8ebfaae505a983e6a
                                                     #n3代表切片步长，可以不提供，默认值是1，步长值不能为0
 ####################################################################################################################
 
@@ -83,9 +87,14 @@ for e in range(start,start+N):                            #循环2次，读取11
     cor = []
     #id = []
     idcompare = []
+<<<<<<< HEAD
     time_window = 1800
     wave = list_of_groups(s1_filter1 ,time_window) #滑动时间窗设为1666ms
     count = int(len(s1_filter1)/ time_window) #计算有多少个sharp_wave
+=======
+    wave = list_of_groups(s1_filter1 ,1666)#滑动时间窗设为1666ms
+    count = int(len(s1_filter1)/ 1666)#计算有多少个sharp_wave
+>>>>>>> ee377eee7885028e693f39a8ebfaae505a983e6a
     # for i in range(0,count):
     #     id.append(i+1)
     # data1 = pd.DataFrame({'id': id, 'wave': wave})
@@ -94,6 +103,7 @@ for e in range(start,start+N):                            #循环2次，读取11
         for j in range(i+1, count):
             wave2 = pd.Series(wave[j])
             wave1 = pd.Series(wave[i])
+<<<<<<< HEAD
             cor1 = math.fabs(wave1.corr(wave2)) #计算两个sharp_wave的pearson相关系数
             cor.append(cor1) #记录相关系数
             idcompare.append([i+1,j+1]) #记录两个波的id
@@ -111,11 +121,21 @@ for e in range(start,start+N):                            #循环2次，读取11
     for i in range(3):
         print("第", i+1, "对:", (data2.loc[data2_length-1-i, 'idcompare'])[0]*time_window, "与", (data2.loc[data2_length-1-i, 'idcompare'])[1]*time_window)
         print("相关系数为:", round(data2.loc[data2_length-1-i, "cor"], 4), "\n")
+=======
+            cor1 = math.fabs(wave1.corr(wave2))#计算两个sharp_wave的pearson相关系数
+            cor.append(cor1)#记录相关系数
+            idcompare.append([i+1,j+1])#记录两个波的id
+            #cor.append([math.fabs(correlation_coefficient(wave[i], wave[j], 1666)),[i+1,j+1]])
+    data2 = pd.DataFrame({'idcompare': idcompare, 'cor': cor})
+    data2.sort_values(by='cor', axis=0, ascending=True, inplace=True)#按照相关系数大小排序
+    print(data2)
+>>>>>>> ee377eee7885028e693f39a8ebfaae505a983e6a
 ###################################################################################################################
 
 #画图
 ###################################################################################################################
     fig1 = plt.figure()                             #创建画图对象，开始画图
+<<<<<<< HEAD
     # ax1 = fig1.add_subplot(211)
     #                 #在一张figure里面生成多张子图，将画布分割成2行1列， 图像画在从左到右从上到下的第1块
     #                 #例如，fig1.add_subplot(349)  将画布分割成3行4列，图像画在从左到右从上到下的第9块
@@ -125,6 +145,17 @@ for e in range(start,start+N):                            #循环2次，读取11
     # plt.ylabel('Amplitude')                         #设定子图211的Y轴lable为amplitude
 
     ax2 = fig1.add_subplot(111)
+=======
+    ax1 = fig1.add_subplot(211)
+                    #在一张figure里面生成多张子图，将画布分割成2行1列， 图像画在从左到右从上到下的第1块
+                    #例如，fig1.add_subplot(349)  将画布分割成3行4列，图像画在从左到右从上到下的第9块
+
+    plt.plot(s1,color='r')                          #在选定的画布位置上，画未经滤波的s1图像，设定颜色为红色
+    ax1.set_title('Denoised Signal')               #设定子图211的title为denoised signal
+    plt.ylabel('Amplitude')                         #设定子图211的Y轴lable为amplitude
+
+    ax2 = fig1.add_subplot(212)
+>>>>>>> ee377eee7885028e693f39a8ebfaae505a983e6a
                     # 在一张figure里面生成多张子图，将画布分割成2行1列， 图像画在从左到右从上到下的第2块
 
     plt.plot(s1_filter1,color='r')                  #在选定的画布位置上，画经过滤波的s1_filter1图像，设定颜色为红色

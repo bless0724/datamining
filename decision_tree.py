@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-     支持文件中出现中文字符
 #####################################################################
 import random
-
-import decorator
 import numpy as np
 import pandas as pd
 from scipy import signal
-import math
-import matplotlib
-from matplotlib import pyplot as plt
-import os
-import gc   #gc模块提供一个接口给开发者设置垃圾回收的选项
-import time
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn import tree
+import graphviz
 
 def  psfeatureTime(data):#计算特征,随机加label
     # 均值
     df_mean = data.mean()
-    # 方差
-    df_var = data.var()
     # 标准差
     df_std = data.std()
     # 均方根
@@ -26,22 +21,16 @@ def  psfeatureTime(data):#计算特征,随机加label
     df_skew = pd.Series(data).skew()
     # 峰度
     df_kurt = pd.Series(data).kurt()
-    # sum = 0
-    # for i in range(len(data)):
-    #     sum += np.sqrt(abs(data[i]))
-    # # 波形因子
-    # df_boxing = df_rms / (abs(data).mean())
-    # # 峰值因子
-    # df_fengzhi = (max(data)) / df_rms
-    # # 脉冲因子
-    # df_maichong = (max(data)) / (abs(data).mean())
-    # # 裕度因子
-    # df_yudu = max(data) / pow(sum / (len(data)), 2)
-    # # 峭度
-    # df_qiaodu = (np.sum([x ** 4 for x in data]) / len(data)) / pow(df_rms, 4)
-    df_label = random.randint(1, 3)
-    featuretime_list = [df_mean, df_var, df_std, df_rms, df_skew, df_kurt, #df_boxing, df_fengzhi, df_maichong, df_yudu, df_qiaodu,
-     df_label]
+    sum = 0
+    for i in range(len(data)):
+        sum += np.sqrt(abs(data[i]))
+    # 峰值因子
+    df_fengzhi = (max(data)) / df_rms
+    # 裕度因子
+    df_yudu = max(data) / pow(sum / (len(data)), 2)
+    # 峭度
+    df_qiaodu = (np.sum([x ** 4 for x in data]) / len(data)) / pow(df_rms, 4)
+    featuretime_list = [df_mean, df_skew, df_kurt, df_fengzhi, df_yudu, df_qiaodu]
     return featuretime_list
 
 def list_of_groups(init_list, childern_list_len):#设定滑动时间窗，每一个sharp wave为一个list
@@ -50,29 +39,6 @@ def list_of_groups(init_list, childern_list_len):#设定滑动时间窗，每一
     count = len(init_list) % childern_list_len
     end_list.append(init_list[-count:]) if count != 0 else end_list
     return end_list
-
-def gini_Impurity(pos, label, length):
-    count = [0,0,0]
-    for i in range(pos):
-        if label[i] == 1:
-            count[0] += 1
-        elif label[i] == 2:
-            count[1] += 1
-        else:
-            count[2] += 1
-    ginileft = 1-math.pow(count[0]/(pos+1), 2)-math.pow(count[1]/(pos+1), 2)-math.pow(count[2]/(pos+1), 2)
-    count = [0, 0, 0]
-    for i in range(pos, length):
-        if label[i] == 1:
-            count[0] += 1
-        elif label[i] == 2:
-            count[1] += 1
-        else:count[2] += 1
-    giniright = 1-math.pow(count[0]/(length-pos+1), 2)-math.pow(count[1]/(length-pos+1), 2)-math.pow(count[2]/(length-pos+1), 2)
-    gini = ((pos+1)/length)*ginileft + (1-((pos+1)/length))*giniright
-    return gini
-
-def CART_Decision_Tree():
 
 #读取文件第一列，保存在s1列表中
 ###########################################################################################################
@@ -107,18 +73,23 @@ for e in range(start, start+N):                            #循环2次，读取1
     count = int(len(s1_filter1) / 150)  # 有300个采样点
     for i in range(0, count):
         s1_feature.append(psfeatureTime(np.array(s1_list[i])))#每一个采样点计算特征值
-###################################################################################################################
-    idx = pd.Index(np.arange(1, count + 1))  # 行索引
-    df_feature = pd.DataFrame(s1_feature, index=idx,
-                              columns=['均值', '方差', '标准差', '均方根', '偏度', '峰度',
-                                       #'波形因子', '峰值因子', '脉冲因子', '裕度因子','峭度'
-                                       'label'])  # dataframe格式保存，行为每一秒，列为特征值
-    vals = np.around(df_feature.values, 5)  # 数值保留5位小数
+    s1_label = []
+    for i in range(count):
+        s1_label.append((i+1)%3)
+    features = np.array(s1_feature)
+    labels = np.array(s1_label)
+    #print(labels)
+    train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.33, random_state=1)
+    clf = DecisionTreeClassifier(criterion='gini')
+    clf = clf.fit(train_features, train_labels)
+    dot_data = tree.export_graphviz(clf, out_file=None,
+                         feature_names=["均值","偏度","峰度","峰值因子","裕度因子","峭度"],
+                         class_names=["1","2","3"],
+                         filled=True, rounded=True,
+                         special_characters=True)
+    graph = graphviz.Source(dot_data)
+    graph.render("decision tree")
 
-    df_feature = df_feature.sort_values(by='均值', axis=0, ascending=True) #按照相关系数大小排序
-    df_feature = df_feature.reset_index(drop=True) #重置data2的编号
-    gini_array = np.zeros(count+1)
-    for i in range(count+1):
-        gini_array[i] = gini_Impurity(i,df_feature['label'],count)
-    split_pos = np.argmin(gini_array)
-    print(split_pos)
+    test_predict = clf.predict(test_features)
+    score = accuracy_score(test_labels, test_predict)
+    print("分类树准确率 %.4lf" % score)

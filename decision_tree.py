@@ -87,7 +87,7 @@ for e in range(start, start+N):                            #循环2次，读取1
                          filled=True, rounded=True,
                          special_characters=True)
     graph = graphviz.Source(dot_data)
-    graph.render("decision tree")#保存
+    graph.render(r'decision tree_%d' % (e))#保存
 
     test_predict = clf.predict(test_features)
     score = accuracy_score(test_labels, test_predict)

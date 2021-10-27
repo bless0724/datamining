@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-     支持文件中出现中文字符
 #####################################################################
-import random
 import numpy as np
 import pandas as pd
 from scipy import signal

@@ -55,7 +55,7 @@ def knn(trainData, testData, labels, k):
     sortDistance = distances.argsort()
 
     count = {}
-
+    # 投票
     for i in range(k):
         vote = labels[sortDistance[i]]
         count[vote] = count.get(vote, 0) + 1
@@ -65,6 +65,7 @@ def knn(trainData, testData, labels, k):
     # 返回出现频数最高的类别
     return sortCount[0][0]
 
+# 混淆矩阵
 def confusion_matrix(predict,real):
     matrix = numpy.zeros((3,3)).astype('int64')
     for i in range(len(predict)):
@@ -113,7 +114,10 @@ for e in range(start, start+N):                            #循环2次，读取1
     #print(labels)
     train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.33, random_state=0)#划分训练集和测试集
     test_predict = []
-    for i in range(len(test_labels)):
+    for i in range(len(test_labels)):#测试集的结果
         X = knn(train_features, test_features[i], train_labels, 5)
         test_predict.append(X)
-    print(confusion_matrix(test_predict, test_labels))
+    confus_matri = confusion_matrix(test_predict, test_labels)
+    print("混淆矩阵为：\n",confus_matri)#输出混淆矩阵
+    acc=(confus_matri[0,0]+confus_matri[1,1]+confus_matri[2,2])/sum(map(sum,confus_matri))#计算ACC
+    print("准确率为：%.4lf\n" %acc)

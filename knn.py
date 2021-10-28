@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-     支持文件中出现中文字符
 #####################################################################
 import operator
-import random
-
 import numpy
 import numpy as np
 import pandas as pd
 from scipy import signal
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 
 def  psfeatureTime(data):#计算特征
     # 均值

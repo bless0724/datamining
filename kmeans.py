@@ -58,7 +58,7 @@ class K_Means(object):
 
     def cost(self, data):
         sum = 0
-        for center in range(len(self.centers_)):
+        for center in self.centers_:
             for c in range(len(self.clf_[center])):
                 sum += math.pow(np.linalg.norm(self.clf_[center][c] - self.centers_[center]),2)
         sum /= len(data)

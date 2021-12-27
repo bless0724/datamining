@@ -141,6 +141,9 @@ if __name__ == '__main__':
     for cat in k_means.clf_:
         for point in k_means.clf_[cat]:
             ax.scatter(point[0], point[1], point[2], c=c[cat])
+    ax.set_xlabel('均值',fontproperties='SimHei')
+    ax.set_ylabel('偏度',fontproperties='SimHei')
+    ax.set_zlabel('峰度',fontproperties='SimHei')
     cost = k_means.cost(features)
     print("代价为：",cost)
     plt.show()

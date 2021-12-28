@@ -59,7 +59,7 @@ if __name__ =="__main__":
     labels = [int(float(s)) for s in labels]
     labels = np.array(labels)
     #划分训练集测试集
-    train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.25,
+    train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.33,
                                                                                 random_state=0)
     test_predict = []
     for i in range(len(test_labels)):
